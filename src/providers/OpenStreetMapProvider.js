@@ -7,12 +7,22 @@ if (typeof GeocoderJS === "undefined" && typeof require === "function") {
 
 ;(function (GeocoderJS) {
   "use strict";
+  
+  var useSSL;
+  var email;
+  var countrycodes;
 
-  GeocoderJS.OpenStreetMapProvider = function(_externalLoader) {
+  GeocoderJS.OpenStreetMapProvider = function(_externalLoader, options) {
     if (_externalLoader === undefined) {
       throw "No external loader defined.";
     }
     this.externalLoader = _externalLoader;
+
+    options = (options) ? options : {};
+
+    countrycodes = (options.countrycodes) ? options.countrycodes : null;
+    useSSL = (options.useSSL) ? options.useSSL : false;
+    email = (options.email) ? options.email : null;
   };
 
   GeocoderJS.OpenStreetMapProvider.prototype = new GeocoderJS.ProviderBase();
@@ -20,7 +30,7 @@ if (typeof GeocoderJS === "undefined" && typeof require === "function") {
 
   GeocoderJS.OpenStreetMapProvider.prototype.geocode = function(searchString, callback) {
     this.externalLoader.setOptions({
-      protocol: 'http',
+      protocol: (useSSL) ? 'https' : 'http',
       host: 'nominatim.openstreetmap.org',
       pathname: 'search'
     });
@@ -31,12 +41,15 @@ if (typeof GeocoderJS === "undefined" && typeof require === "function") {
       addressdetails: 1
     };
 
+    if (email) { params.email = email; }
+    if (countrycodes) { params.coutrycodes = countrycodes; }
+
     this.executeRequest(params, callback);
   };
 
   GeocoderJS.OpenStreetMapProvider.prototype.geodecode = function(latitude, longitude, callback) {
     this.externalLoader.setOptions({
-      protocol: 'http',
+      protocol: (useSSL) ? 'https' : 'http',
       host: 'nominatim.openstreetmap.org',
       pathname: 'reverse'
     });
@@ -49,10 +62,15 @@ if (typeof GeocoderJS === "undefined" && typeof require === "function") {
       zoom: 18
     };
 
+    if (email) { params.email = email; }
+    if (countrycodes) { params.countrycodes = countrycodes; }
+
     var _this = this;
 
     this.executeRequest(params, callback);
   };
+
+
 
   GeocoderJS.OpenStreetMapProvider.prototype.executeRequest = function(params, callback) {
     var _this = this;
@@ -64,7 +82,7 @@ if (typeof GeocoderJS === "undefined" && typeof require === "function") {
           results.push(_this.mapToGeocoded(data[i]));
         }
       } else {
-        results.push(_this.mapToGeocoded(data));
+        results = null;
       }
 
       callback(results);
@@ -74,9 +92,18 @@ if (typeof GeocoderJS === "undefined" && typeof require === "function") {
   GeocoderJS.OpenStreetMapProvider.prototype.mapToGeocoded = function(result) {
     var geocoded = new GeocoderJS.Geocoded();
 
+    if (result.length === 0) return null;
+
     geocoded.latitude = result.lat * 1;
     geocoded.longitude = result.lon * 1;
-
+    geocoded.formattedAddress = result.display_name;
+    
+    geocoded.bounds = [
+      parseFloat(result.boundingbox[0]),
+      parseFloat(result.boundingbox[2]),
+      parseFloat(result.boundingbox[1]),                        
+      parseFloat(result.boundingbox[3])
+    ];     
     geocoded.streetNumber = (result.address.house_number !== undefined) ? result.address.house_number : undefined;
     geocoded.streetName = result.address.road;
     geocoded.city = result.address.city;
