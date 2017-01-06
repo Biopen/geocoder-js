@@ -37,6 +37,9 @@ describe("Geocoded method access", function() {
   it ("Geocoded has getRegion method", function() {
     expect(geocoded.getRegion).toBeDefined();
   });
+  it ("Geocoded has getFormatted method", function() {
+    expect(geocoded.getFormattedAddress).toBeDefined();
+  });
 });
 
 describe("Geocoded returns data properly", function() {
@@ -48,6 +51,7 @@ describe("Geocoded returns data properly", function() {
   geocoded.city = "Washington";
   geocoded.region = "DC";
   geocoded.postal_code = "20050";
+  geocoded.formattedAddress = "1600 Pennsylvania Avenue Northwest, Washington DC 20050";
 
   it ("Geocoded returns proper coordinates", function() {
     var expectedCoordinates = [38.8978378, -77.0365123];
@@ -77,6 +81,10 @@ describe("Geocoded returns data properly", function() {
 
   it ("Geocoded returns proper Postal Code", function() {
     expect(geocoded.getZipcode()).toEqual("20050");
+  });
+  it ("Geocoded returns proper Formatted Address", function() {
+    expect(geocoded.getFormattedAddress())
+      .toEqual("1600 Pennsylvania Avenue Northwest, Washington DC 20050");
   });
 
 });
