@@ -11,7 +11,7 @@ if (typeof GeocoderJS === "undefined" && typeof require === "function") {
     getCoordinates: function() {return[this.latitude, this.longitude];},
     getLatitude: function() {return this.latitude;},
     getLongitude: function() {return this.longitude;},
-    getBounds: function() {},
+    getBounds: function()  {return this.bounds;},
     getStreetNumber: function() {return this.streetNumber;},
     getStreetName: function() {return this.streetName;},
     getCity: function() {return this.city;},
@@ -19,7 +19,8 @@ if (typeof GeocoderJS === "undefined" && typeof require === "function") {
     getCityDistrict: function() {},
     getCounty: function() {},
     getCountyCode: function() {},
-    getRegion: function() {return this.region;}
+    getRegion: function() {return this.region;},
+    getFormattedAddress: function() {return this.formattedAddress;}
   };
 
 })(GeocoderJS);
