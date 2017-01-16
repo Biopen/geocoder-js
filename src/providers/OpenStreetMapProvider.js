@@ -96,7 +96,7 @@ if (typeof GeocoderJS === "undefined" && typeof require === "function") {
 
     geocoded.latitude = result.lat * 1;
     geocoded.longitude = result.lon * 1;
-    geocoded.formattedAddress = result.display_name;
+    //geocoded.formattedAddress = result.display_name;
     
     geocoded.bounds = [
       parseFloat(result.boundingbox[0]),
@@ -109,6 +109,31 @@ if (typeof GeocoderJS === "undefined" && typeof require === "function") {
     geocoded.city = result.address.city;
     geocoded.region = result.address.state;
     geocoded.postal_code = result.address.postcode;
+
+    if (geocoded.streetNumber)
+    {
+      geocoded.formattedAddress = geocoded.streetNumber + ' ' + geocoded.streetName + ', ' + geocoded.city;
+    }
+    else if (geocoded.streetName)
+    {
+      geocoded.formattedAddress = geocoded.streetName + ', ' + geocoded.city;
+    }
+    else if (geocoded.city)
+    {
+      geocoded.formattedAddress = geocoded.city + ' ' + geocoded.postal_code;
+    }
+    else if (geocoded.county)
+    {
+      geocoded.formattedAddress = geocoded.county + ', ' + geocoded.region;
+    }
+    else if (geocoded.region)
+    {
+      geocoded.formattedAddress = geocoded.region;
+    }
+    else
+    {
+      geocoded.formattedAddress = geocoded.state;
+    }
 
     return geocoded;
   };
